@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Housero - Sync</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="popup">
+    <div class="header">
+      <span class="label">Pendrive conectado</span>
+      <h1 class="sync-title" id="sync-title">Sincronizando...</h1>
+    </div>
+    <div class="summary" id="summary"></div>
+    <div class="section" id="delete-section" style="display:none;">
+      <span class="label">Archivos a borrar del PD</span>
+      <ul class="delete-list" id="delete-list"></ul>
+    </div>
+    <div class="progress-section" id="progress-section" style="display:none;">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <span class="progress-label" id="progress-label"></span>
+    </div>
+    <div class="actions" id="actions">
+      <button class="btn btn-cancel" onclick="ahora_no()">Ahora no</button>
+      <button class="btn btn-confirm" onclick="aplicar()">Aplicar al PD</button>
+    </div>
+  </div>
+  <script>
+    function conectar() {
+      if (typeof qt === 'undefined' || !qt.webChannelTransport) {
+        setTimeout(conectar, 100);
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = 'qrc:///qtwebchannel/qwebchannel.js';
+      s.onload = function () {
+        new QWebChannel(qt.webChannelTransport, function (ch) {
+          window._api = ch.objects.api;
+          onApiReady(window._api);
+        });
+      };
+      document.head.appendChild(s);
+    }
+    conectar();
+
+    function onApiReady(api) {
+      api.getDatos(function (json) {
+        var d = JSON.parse(json);
+        var summary = document.getElementById('summary');
+        var title = document.getElementById('sync-title');
+        summary.innerHTML = '';
+
+        if (d.copiar === 0 && d.borrar === 0) {
+          title.textContent = 'Todo al dia';
+          var div = document.createElement('div');
+          div.className = 'summary-item';
+          div.textContent = 'El PD ya esta actualizado';
+          summary.appendChild(div);
+          document.querySelector('.btn-confirm').disabled = true;
+          document.querySelector('.btn-confirm').style.opacity = '0.3';
+        } else {
+          title.textContent = d.copiar + d.borrar + ' cambio' + (d.copiar + d.borrar > 1 ? 's' : '') + ' pendiente' + (d.copiar + d.borrar > 1 ? 's' : '');
+          if (d.copiar > 0) {
+            var div1 = document.createElement('div');
+            div1.className = 'summary-item summary-copy';
+            div1.textContent = '+  ' + d.copiar + ' archivo' + (d.copiar > 1 ? 's' : '') + ' para copiar';
+            summary.appendChild(div1);
+          }
+          if (d.borrar > 0) {
+            var div2 = document.createElement('div');
+            div2.className = 'summary-item summary-delete';
+            div2.textContent = 'x  ' + d.borrar + ' archivo' + (d.borrar > 1 ? 's' : '') + ' para borrar';
+            summary.appendChild(div2);
+          }
+        }
+
+        if (d.lista_borrar && d.lista_borrar.length > 0) {
+          var section = document.getElementById('delete-section');
+          var lista = document.getElementById('delete-list');
+          section.style.display = 'flex';
+          lista.innerHTML = '';
+          d.lista_borrar.forEach(function (rel) {
+            var li = document.createElement('li');
+            li.className = 'delete-item';
+            li.textContent = rel;
+            lista.appendChild(li);
+          });
+        }
+      });
+    }
+
+    function ahora_no() {
+      if (window._api) window._api.ahora_no();
+    }
+    function aplicar() {
+      document.getElementById('actions').style.display = 'none';
+      document.getElementById('progress-section').style.display = 'block';
+      if (window._api) window._api.aplicar();
+    }
+    function actualizarProgreso(pct, nombre) {
+      var fill = document.getElementById('progress-fill');
+      var label = document.getElementById('progress-label');
+      if (fill) fill.style.width = pct + '%';
+      if (label) label.textContent = nombre;
+    }
+  </script>
+</body>
+
+</html>
