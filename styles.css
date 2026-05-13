@@ -8,8 +8,7 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -42,7 +41,7 @@ body {
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #5a66cf;
+  color: #f59e0b;
 }
 
 .header .filename {
@@ -64,7 +63,7 @@ body {
   background: #0f0f0f;
 }
 
-.section>.label {
+.section > .label {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 2px;
@@ -125,20 +124,19 @@ body {
 }
 
 .folder-item:hover::before {
-  background: #5a66cf;
+  background: #f59e0b;
 }
 
 .folder-item.selected {
   background: #1c1c1c;
   color: #f0f0f0;
-  border-left: 2px solid #5a66cf;
+  border-left: 2px solid #f59e0b;
   padding-left: 22px;
 }
 
 .folder-item.selected::before {
-  background: #5a66cf;
+  background: #f59e0b;
 }
-
 
 /* ── SYNC TITLE ── */
 .sync-title {
@@ -239,7 +237,7 @@ body {
   letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.3s, border-color 0.15s, color 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .btn-cancel {
@@ -255,12 +253,86 @@ body {
 }
 
 .btn-confirm {
-  background: #5a66cf;
+  background: #f59e0b;
   color: #0f0f0f;
-  border-color: #5a66cf;
+  border-color: #f59e0b;
+}
 
-  &:hover {
-    background-color: #8089db;
-    border-color: #5a66cf;
-  }
+.btn-confirm:hover {
+  background: #fbbf24;
+  border-color: #fbbf24;
+}
+
+/* ── SETTINGS ── */
+.settings-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.setting-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.setting-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f0f0f0;
+}
+
+.setting-desc {
+  font-size: 11px;
+  color: #555;
+}
+
+.setting-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.setting-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.setting-path {
+  flex: 1;
+  font-size: 11px;
+  color: #888;
+  font-family: 'Consolas', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #1a1a1a;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #2a2a2a;
+}
+
+.btn-ruta {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #888;
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-ruta:hover {
+  background: #1a1a1a;
+  color: #f0f0f0;
+  border-color: #444;
 }
