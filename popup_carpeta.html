@@ -24,59 +24,55 @@
     </div>
   </div>
   <script>
-    function conectar() {
-      if (typeof qt === 'undefined' || !qt.webChannelTransport) {
-        setTimeout(conectar, 100);
-        return;
-      }
-      var s = document.createElement('script');
-      s.src = 'qrc:///qtwebchannel/qwebchannel.js';
-      s.onload = function() {
-        new QWebChannel(qt.webChannelTransport, function(ch) {
-          window._api = ch.objects.api;
-          onApiReady(window._api);
-        });
-      };
-      document.head.appendChild(s);
-    }
-    conectar();
+    window.addEventListener('DOMContentLoaded', async () => {
+      const nombre   = await window.api.carpeta.getNombre()
+      const carpetas = await window.api.carpeta.getCarpetas()
 
-    function onApiReady(api) {
-      api.getNombre(function(nombre) {
-        document.getElementById('filename').textContent = nombre;
-      });
-      api.getCarpetas(function(json) {
-        var carpetas = JSON.parse(json);
-        var lista = document.getElementById('folder-list');
-        lista.innerHTML = '';
-        carpetas.forEach(function(c, i) {
-          var li = document.createElement('li');
-          li.className = 'folder-item' + (i === 0 ? ' selected' : '');
-          li.textContent = c;
-          li.addEventListener('click', function() {
-            document.querySelectorAll('.folder-item').forEach(function(el) { el.classList.remove('selected'); });
-            li.classList.add('selected');
-          });
-          li.addEventListener('dblclick', function() { api.confirmar(li.textContent.trim()); });
-          lista.appendChild(li);
-        });
-      });
-      document.addEventListener('keydown', function(e) {
-        var items = Array.from(document.querySelectorAll('.folder-item'));
-        var idx = items.findIndex(function(i) { return i.classList.contains('selected'); });
-        if (e.key === 'ArrowDown') { var n = Math.min(items.length-1, idx+1); items.forEach(function(i){i.classList.remove('selected');}); items[n].classList.add('selected'); items[n].scrollIntoView({block:'nearest'}); }
-        if (e.key === 'ArrowUp') { var n = Math.max(0, idx-1); items.forEach(function(i){i.classList.remove('selected');}); items[n].classList.add('selected'); items[n].scrollIntoView({block:'nearest'}); }
-        if (e.key === 'Enter') { var sel = document.querySelector('.folder-item.selected'); if (sel) api.confirmar(sel.textContent.trim()); }
-        if (e.key === 'Escape') api.cancelar();
-      });
-    }
+      document.getElementById('filename').textContent = nombre
+
+      const lista = document.getElementById('folder-list')
+      lista.innerHTML = ''
+      carpetas.forEach((c, i) => {
+        const li = document.createElement('li')
+        li.className = 'folder-item' + (i === 0 ? ' selected' : '')
+        li.textContent = c
+        li.addEventListener('click', () => {
+          document.querySelectorAll('.folder-item').forEach(el => el.classList.remove('selected'))
+          li.classList.add('selected')
+        })
+        li.addEventListener('dblclick', () => window.api.carpeta.confirmar(li.textContent.trim()))
+        lista.appendChild(li)
+      })
+
+      document.addEventListener('keydown', e => {
+        const items = Array.from(document.querySelectorAll('.folder-item'))
+        const idx   = items.findIndex(i => i.classList.contains('selected'))
+        if (e.key === 'ArrowDown') {
+          const n = Math.min(items.length - 1, idx + 1)
+          items.forEach(i => i.classList.remove('selected'))
+          items[n].classList.add('selected')
+          items[n].scrollIntoView({ block: 'nearest' })
+        }
+        if (e.key === 'ArrowUp') {
+          const n = Math.max(0, idx - 1)
+          items.forEach(i => i.classList.remove('selected'))
+          items[n].classList.add('selected')
+          items[n].scrollIntoView({ block: 'nearest' })
+        }
+        if (e.key === 'Enter') {
+          const sel = document.querySelector('.folder-item.selected')
+          if (sel) window.api.carpeta.confirmar(sel.textContent.trim())
+        }
+        if (e.key === 'Escape') window.api.carpeta.cancelar()
+      })
+    })
 
     function confirmar() {
-      var sel = document.querySelector('.folder-item.selected');
-      if (sel && window._api) window._api.confirmar(sel.textContent.trim());
+      const sel = document.querySelector('.folder-item.selected')
+      if (sel) window.api.carpeta.confirmar(sel.textContent.trim())
     }
     function cancelar() {
-      if (window._api) window._api.cancelar();
+      window.api.carpeta.cancelar()
     }
   </script>
 </body>

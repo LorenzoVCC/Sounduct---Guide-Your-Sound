@@ -328,7 +328,8 @@ def abrir_popup_sync(copiar, borrar):
 #  POPUP SETTINGS
 # ──────────────────────────────────────────────
 class APISettings(QObject):
-    cerrar_signal = pyqtSignal()
+    cerrar_signal   = pyqtSignal()
+    carpetaElegida  = pyqtSignal(str)
 
     @pyqtSlot(result=str)
     def getConfig(self):
@@ -353,13 +354,22 @@ class APISettings(QObject):
     def cancelar(self):
         self.cerrar_signal.emit()
 
-    @pyqtSlot(str, result=str)
+    @pyqtSlot(str)
     def elegirCarpeta(self, titulo):
+        QTimer.singleShot(0, lambda: self._abrir_dialogo(titulo))
+
+    def _abrir_dialogo(self, titulo):
         from PyQt6.QtWidgets import QFileDialog
-        from PyQt6.QtCore import QCoreApplication
-        QCoreApplication.processEvents()
-        carpeta = QFileDialog.getExistingDirectory(None, titulo, os.path.expanduser("~"))
-        return carpeta or ""
+        dlg = QFileDialog(None, titulo, os.path.expanduser("~"))
+        dlg.setFileMode(QFileDialog.FileMode.Directory)
+        dlg.setOption(QFileDialog.Option.ShowDirsOnly, True)
+        dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
+        dlg.raise_()
+        dlg.activateWindow()
+        if dlg.exec():
+            self.carpetaElegida.emit(dlg.selectedFiles()[0])
+        else:
+            self.carpetaElegida.emit("")
 
 
 def abrir_popup_settings(callback=None):

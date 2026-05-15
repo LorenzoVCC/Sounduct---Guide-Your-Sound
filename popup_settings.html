@@ -57,44 +57,34 @@
   </div>
 
   <script>
-    var rutas = { descargas: '', biblioteca: '', pd: '' };
+    var rutas = { descargas: '', biblioteca: '', pd: '' }
+    var _ids  = { descargas: 'path-descargas', biblioteca: 'path-biblioteca', pd: 'path-pd' }
 
-    function onApiReady(api) {
-      api.getConfig(function(json) {
-        var cfg = JSON.parse(json);
-        rutas.descargas  = cfg.descargas;
-        rutas.biblioteca = cfg.biblioteca;
-        rutas.pd         = cfg.pd;
-        document.getElementById('path-descargas').textContent  = cfg.descargas;
-        document.getElementById('path-biblioteca').textContent = cfg.biblioteca;
-        document.getElementById('path-pd').textContent         = cfg.pd;
-      });
-    }
+    window.addEventListener('DOMContentLoaded', async () => {
+      const cfg = await window.api.settings.getConfig()
+      rutas.descargas  = cfg.descargas
+      rutas.biblioteca = cfg.biblioteca
+      rutas.pd         = cfg.pd
+      document.getElementById('path-descargas').textContent  = cfg.descargas
+      document.getElementById('path-biblioteca').textContent = cfg.biblioteca
+      document.getElementById('path-pd').textContent         = cfg.pd
+    })
 
-    function elegir(campo) {
-      var titulos = {
+    async function elegir(campo) {
+      const titulos = {
         descargas:  'Seleccionar carpeta de descargas',
         biblioteca: 'Seleccionar biblioteca de música',
         pd:         'Seleccionar carpeta del pendrive'
-      };
-      if (window._api) {
-        window._api.elegirCarpeta(titulos[campo], function(ruta) {
-          if (ruta) {
-            rutas[campo] = ruta;
-            var ids = { descargas: 'path-descargas', biblioteca: 'path-biblioteca', pd: 'path-pd' };
-            document.getElementById(ids[campo]).textContent = ruta;
-          }
-        });
+      }
+      const ruta = await window.api.settings.elegirCarpeta(titulos[campo])
+      if (ruta) {
+        rutas[campo] = ruta
+        document.getElementById(_ids[campo]).textContent = ruta
       }
     }
 
-    function guardar() {
-      if (window._api) window._api.guardar(JSON.stringify(rutas));
-    }
-
-    function cancelar() {
-      if (window._api) window._api.cancelar();
-    }
+    function guardar()  { window.api.settings.guardar(rutas) }
+    function cancelar() { window.api.settings.cancelar() }
   </script>
 </body>
 </html>

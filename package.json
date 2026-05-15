@@ -1,0 +1,13 @@
+{
+  "name": "sounduct",
+  "version": "1.0.0",
+  "description": "Gestor de descargas de audio para DJs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "electron": "^31.0.0"
+  }
+}
